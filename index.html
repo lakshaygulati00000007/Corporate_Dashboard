@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Enabled Corporate Finance Dashboard</title>
+
+  <!-- High-performance modern typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       DESIGN SYSTEM & 60-120 FPS HARDWARE ACCELERATED STYLES
+       ========================================================================== */
+    :root {
+      --bg: #eaf4fd;
+      --bg-gradient: radial-gradient(circle at 50% -10%, #d8ecfe 0%, #edf6fe 50%, #f4faff 100%);
+      --surface: #ffffff;
+      --surface-card: #ffffff;
+      --surface-border: rgba(2, 132, 199, 0.18);
+      --surface-border-hover: rgba(2, 132, 199, 0.35);
+      --accent: #0284c7;
+      --accent-glow: rgba(2, 132, 199, 0.28);
+      --accent-subtle: rgba(2, 132, 199, 0.08);
+      --text: #0f172a;
+      --text-muted: #5a6e85;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg);
+      background-image: var(--bg-gradient);
+      color: var(--text);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      padding: 1.25rem 1.25rem 2rem 1.25rem;
+    }
+
+    /* Top Navigation / Brand Header */
+    header {
+      width: 100%;
+      max-width: 1360px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.25rem 1.25rem 0.25rem;
+      gap: 1rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-logo {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    .header-divider {
+      width: 1px;
+      height: 30px;
+      background: rgba(2, 132, 199, 0.22);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.28);
+    }
+
+    .brand-icon svg {
+      width: 19px;
+      height: 19px;
+      fill: #ffffff;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .slide-counter {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      padding: 0.4rem 0.95rem;
+      border-radius: 999px;
+      letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      user-select: none;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+    }
+
+    .slide-counter .current-num {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .fullscreen-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      outline: none;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+    }
+
+    .fullscreen-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      background: var(--accent-subtle);
+      transform: scale(1.05);
+    }
+
+    .fullscreen-btn svg {
+      width: 17px;
+      height: 17px;
+    }
+
+    /* ==========================================================================
+       CAROUSEL STAGE & CONTAINER (ZERO-LAG 60FPS TRANSFORM TRACK)
+       ========================================================================== */
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      max-width: 1360px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .carousel-viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9.2;
+      min-height: 420px;
+      max-height: calc(100vh - 220px);
+      background: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 48px rgba(2, 132, 199, 0.12), 0 4px 16px rgba(15, 23, 42, 0.04);
+      user-select: none;
+      touch-action: pan-y;
+      cursor: grab;
+      contain: paint;
+    }
+
+    .carousel-viewport.is-dragging {
+      cursor: grabbing;
+    }
+
+    /* Transform Track */
+    .carousel-track {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s var(--ease-snappy);
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
+    }
+
+    .carousel-slide {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f8fafc;
+    }
+
+    .slide-media-box {
+      flex: 1;
+      width: 100%;
+      height: calc(100% - 60px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #edf5fc;
+      padding: 0.6rem 0.8rem;
+    }
+
+    .slide-media-box img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+      border: 1px solid rgba(2, 132, 199, 0.12);
+      transform: translateZ(0);
+    }
+
+    /* Slide Caption Bar (Purely showing image caption matching name) */
+    .slide-caption-bar {
+      height: 60px;
+      width: 100%;
+      background: var(--surface);
+      border-top: 1px solid var(--surface-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      z-index: 2;
+    }
+
+    .caption-info {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      min-width: 0;
+    }
+
+    .caption-badge {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-subtle);
+      border: 1px solid rgba(2, 132, 199, 0.22);
+      padding: 0.22rem 0.65rem;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+
+    .caption-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+      letter-spacing: -0.015em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .keyboard-hint {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-shrink: 0;
+    }
+
+    .keyboard-hint kbd {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background: #eaf3fb;
+      border: 1px solid #cce3f7;
+      border-radius: 4px;
+      padding: 0.1rem 0.35rem;
+      color: #1e293b;
+    }
+
+    /* Navigation Arrows (Ergonomic & Fast) */
+    .nav-arrow {
+      position: absolute;
+      top: calc(50% - 30px);
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(2, 132, 199, 0.22);
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: background 0.2s ease, transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.16), 0 2px 6px rgba(0, 0, 0, 0.05);
+      outline: none;
+    }
+
+    .nav-arrow:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .nav-arrow:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    .nav-arrow.prev {
+      left: 1.25rem;
+    }
+
+    .nav-arrow.next {
+      right: 1.25rem;
+    }
+
+    .nav-arrow svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.5;
+    }
+
+    /* Indicator Dots */
+    .indicator-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      margin-top: 1.15rem;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(2, 132, 199, 0.22);
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s var(--ease-snappy);
+      padding: 0;
+      outline: none;
+    }
+
+    .dot:hover {
+      background: rgba(2, 132, 199, 0.45);
+    }
+
+    .dot.active {
+      width: 28px;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    /* Thumbnail Filmstrip */
+    .thumbnail-strip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem;
+      margin-top: 1rem;
+      overflow-x: auto;
+      max-width: 100%;
+      padding: 0.5rem;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(2, 132, 199, 0.3) transparent;
+    }
+
+    @media (max-width: 768px) {
+      .thumbnail-strip {
+        justify-content: flex-start;
+      }
+    }
+
+    .thumbnail-strip::-webkit-scrollbar {
+      height: 4px;
+    }
+    .thumbnail-strip::-webkit-scrollbar-thumb {
+      background: rgba(2, 132, 199, 0.28);
+      border-radius: 4px;
+    }
+
+    .thumb-card {
+      position: relative;
+      width: 96px;
+      height: 54px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #edf5fc;
+      border: 2px solid rgba(2, 132, 199, 0.18);
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.08);
+      cursor: pointer;
+      opacity: 0.65;
+      transition: opacity 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+      padding: 0;
+      outline: none;
+    }
+
+    .thumb-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+    }
+
+    .thumb-card:hover {
+      opacity: 0.95;
+      border-color: rgba(2, 132, 199, 0.45);
+      transform: translateY(-2px);
+    }
+
+    .thumb-card.active {
+      opacity: 1;
+      border-color: var(--accent);
+      box-shadow: 0 0 14px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    /* Fullscreen Mode Styling */
+    :fullscreen .carousel-viewport {
+      max-height: calc(100vh - 160px);
+      height: calc(100vh - 160px);
+      aspect-ratio: auto;
+      border-radius: 0;
+      border-left: none;
+      border-right: none;
+    }
+    :fullscreen body {
+      padding: 0;
+      justify-content: center;
+    }
+
+    /* Responsive Adaptation */
+    @media (max-width: 900px) {
+      body {
+        padding: 0.75rem 0.5rem 1.5rem 0.5rem;
+      }
+      header {
+        padding-bottom: 0.75rem;
+      }
+      .brand-group {
+        gap: 0.65rem;
+      }
+      .brand-logo {
+        height: 28px;
+      }
+      .header-divider {
+        height: 22px;
+      }
+      .brand-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+      }
+      .brand-icon svg {
+        width: 15px;
+        height: 15px;
+      }
+      .brand-title {
+        font-size: 1.05rem;
+        gap: 0.5rem;
+      }
+      .keyboard-hint {
+        display: none;
+      }
+      .carousel-viewport {
+        aspect-ratio: 16 / 10;
+        min-height: 340px;
+        border-radius: 14px;
+      }
+      .slide-caption-bar {
+        height: 52px;
+        padding: 0 1rem;
+      }
+      .caption-title {
+        font-size: 1rem;
+      }
+      .nav-arrow {
+        width: 40px;
+        height: 40px;
+      }
+      .nav-arrow.prev { left: 0.6rem; }
+      .nav-arrow.next { right: 0.6rem; }
+      .thumb-card {
+        width: 76px;
+        height: 44px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Clean Top Bar Header -->
+  <header>
+    <div class="brand-group">
+      <img src="./Public/logo.png" alt="Company Logo" class="brand-logo" onerror="this.onerror=null; this.src='./public/logo.png';">
+      <div class="header-divider"></div>
+      <h1 class="brand-title">
+        <!-- <span class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </span> -->
+        <span>AI Enabled Corporate Finance Dashboard</span>
+      </h1>
+    </div>
+
+    <div class="header-actions">
+      <div class="slide-counter" id="slideCounter" aria-label="Slide position">
+        <span class="current-num" id="currentNum">01</span>
+        <span>/</span>
+        <span id="totalNum">07</span>
+      </div>
+      <button class="fullscreen-btn" id="fullscreenBtn" title="Toggle Fullscreen" aria-label="Toggle Fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Carousel Section -->
+  <main class="carousel-container">
+    <div class="carousel-viewport" id="viewport">
+      <!-- Previous Button -->
+      <button class="nav-arrow prev" id="prevBtn" aria-label="Previous Slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- Next Button -->
+      <button class="nav-arrow next" id="nextBtn" aria-label="Next Slide">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+
+      <!-- 60-120 FPS Transform Track -->
+      <div class="carousel-track" id="track">
+        <!-- Generated dynamically via JS -->
+      </div>
+    </div>
+
+    <!-- Indicator Dots -->
+    <div class="indicator-dots" id="indicatorDots" role="tablist" aria-label="Slides navigation">
+      <!-- Generated dynamically via JS -->
+    </div>
+
+    <!-- Thumbnails Filmstrip -->
+    <div class="thumbnail-strip" id="thumbnailStrip" aria-label="Thumbnails navigation">
+      <!-- Generated dynamically via JS -->
+    </div>
+  </main>
+
+  <script>
+    /**
+     * Pure 60-120 FPS Carousel Engine
+     * Zero layout thrashing, async image decoding, requestAnimationFrame drag physics
+     */
+    const SLIDES = [
+      {
+        fileName: "Consolidated Portfolio.png",
+        caption: "Consolidated Portfolio",
+        src: "./Public/Consolidated%20Portfolio.png",
+        fallback: "./public/Consolidated%20Portfolio.png"
+      },
+      {
+        fileName: "DBR Analytics.png",
+        caption: "DBR Analytics",
+        src: "./Public/DBR%20Analytics.png",
+        fallback: "./public/DBR%20Analytics.png"
+      },
+      {
+        fileName: "FD_MF Schedule.png",
+        caption: "FD_MF Schedule",
+        src: "./Public/FD_MF%20Schedule.png",
+        fallback: "./public/FD_MF%20Schedule.png"
+      },
+      {
+        fileName: "Investment Comparator.png",
+        caption: "Investment Comparator",
+        src: "./Public/Investment%20Comparator.png",
+        fallback: "./public/Investment%20Comparator.png"
+      },
+      {
+        fileName: "Liquidation.png",
+        caption: "Liquidation",
+        src: "./Public/Liquidation.png",
+        fallback: "./public/Liquidation.png"
+      },
+      {
+        fileName: "Project Liabilities.png",
+        caption: "Project Liabilities",
+        src: "./Public/Project%20Liabilities.png",
+        fallback: "./public/Project%20Liabilities.png"
+      },
+      {
+        fileName: "Ai Assistant.png",
+        caption: "Ai Assistant",
+        src: "./Public/Ai%20Assistant.png",
+        fallback: "./public/Ai%20Assistant.png"
+      }
+    ];
+
+    let currentIndex = 0;
+    const totalSlides = SLIDES.length;
+
+    // DOM Elements
+    const track = document.getElementById('track');
+    const indicatorDots = document.getElementById('indicatorDots');
+    const thumbnailStrip = document.getElementById('thumbnailStrip');
+    const currentNum = document.getElementById('currentNum');
+    const totalNum = document.getElementById('totalNum');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const viewport = document.getElementById('viewport');
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    totalNum.textContent = String(totalSlides).padStart(2, '0');
+
+    // Build Carousel Elements
+    function buildCarousel() {
+      track.innerHTML = '';
+      indicatorDots.innerHTML = '';
+      thumbnailStrip.innerHTML = '';
+
+      SLIDES.forEach((slide, idx) => {
+        // Slide DOM
+        const slideEl = document.createElement('div');
+        slideEl.className = 'carousel-slide';
+        slideEl.setAttribute('role', 'group');
+        slideEl.setAttribute('aria-roledescription', 'slide');
+        slideEl.setAttribute('aria-label', `${idx + 1} of ${totalSlides}: ${slide.caption}`);
+
+        slideEl.innerHTML = `
+          <div class="slide-media-box">
+            <img src="${slide.src}"
+                 alt="${slide.caption}"
+                 decoding="async"
+                 draggable="false"
+                 loading="${idx <= 1 ? 'eager' : 'lazy'}"
+                 onerror="this.onerror=null; this.src='${slide.fallback}';">
+          </div>
+          <div class="slide-caption-bar">
+            <div class="caption-info">
+              <h2 class="caption-title">${slide.caption}</h2>
+            </div>
+            <div class="keyboard-hint">
+              <span>Navigate:</span>
+              <kbd>&larr;</kbd>
+              <kbd>&rarr;</kbd>
+            </div>
+          </div>
+        `;
+        track.appendChild(slideEl);
+
+        // Indicator Dot
+        const dot = document.createElement('button');
+        dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+        dot.setAttribute('role', 'tab');
+        dot.setAttribute('aria-label', `Go to slide ${idx + 1}: ${slide.caption}`);
+        dot.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+        dot.addEventListener('click', () => goToSlide(idx));
+        indicatorDots.appendChild(dot);
+
+        // Thumbnail Card
+        const thumb = document.createElement('button');
+        thumb.className = `thumb-card ${idx === 0 ? 'active' : ''}`;
+        thumb.setAttribute('aria-label', `Thumbnail ${slide.caption}`);
+        thumb.innerHTML = `
+          <img src="${slide.src}"
+               alt=""
+               decoding="async"
+               draggable="false"
+               loading="lazy"
+               onerror="this.onerror=null; this.src='${slide.fallback}';">
+        `;
+        thumb.addEventListener('click', () => goToSlide(idx));
+        thumbnailStrip.appendChild(thumb);
+      });
+    }
+
+    // Update Carousel Position and State
+    function updateCarousel() {
+      track.style.transition = 'transform 0.4s var(--ease-snappy)';
+      track.style.transform = `translate3d(-${currentIndex * 100}%, 0, 0)`;
+      currentNum.textContent = String(currentIndex + 1).padStart(2, '0');
+
+      // Update dots
+      const dots = indicatorDots.children;
+      for (let i = 0; i < dots.length; i++) {
+        const isActive = i === currentIndex;
+        dots[i].classList.toggle('active', isActive);
+        dots[i].setAttribute('aria-selected', isActive ? 'true' : 'false');
+      }
+
+      // Update thumbnails
+      const thumbs = thumbnailStrip.children;
+      for (let i = 0; i < thumbs.length; i++) {
+        const isActive = i === currentIndex;
+        thumbs[i].classList.toggle('active', isActive);
+        if (isActive && thumbnailStrip.scrollWidth > thumbnailStrip.clientWidth) {
+          // Keep active thumbnail centered when scrollable
+          const thumbOffset = thumbs[i].offsetLeft - (thumbnailStrip.clientWidth / 2) + (thumbs[i].clientWidth / 2);
+          thumbnailStrip.scrollTo({ left: thumbOffset, behavior: 'smooth' });
+        }
+      }
+    }
+
+    // Slide Navigation Methods
+    function goToSlide(index) {
+      if (index === currentIndex) return;
+      currentIndex = (index + totalSlides) % totalSlides;
+      updateCarousel();
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % totalSlides;
+      updateCarousel();
+    }
+
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+    }
+
+    // Button Click Listeners
+    prevBtn.addEventListener('click', prevSlide);
+    nextBtn.addEventListener('click', nextSlide);
+
+    // Fullscreen Toggle
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    });
+
+    // Keyboard Shortcuts (Arrow keys, numbers, F for fullscreen)
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        goToSlide(0);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        goToSlide(totalSlides - 1);
+      } else if (e.key >= '1' && e.key <= String(totalSlides)) {
+        goToSlide(parseInt(e.key, 10) - 1);
+      } else if (e.key.toLowerCase() === 'f') {
+        fullscreenBtn.click();
+      }
+    });
+
+    /* ==========================================================================
+       HIGH-PERFORMANCE POINTER DRAG / SWIPE (Zero Layout Thrashing + rAF)
+       ========================================================================== */
+    let isPointerDown = false;
+    let isDragging = false;
+    let startX = 0;
+    let currentX = 0;
+    let dragDelta = 0;
+    let cachedViewportWidth = 0;
+    let activePointerId = null;
+    let rAFId = null;
+
+    viewport.addEventListener('pointerdown', (e) => {
+      // Don't drag if clicking navigation buttons
+      if (e.target.closest('.nav-arrow, .fullscreen-btn')) return;
+
+      isPointerDown = true;
+      isDragging = false;
+      startX = e.clientX;
+      currentX = e.clientX;
+      dragDelta = 0;
+      activePointerId = e.pointerId;
+      cachedViewportWidth = viewport.clientWidth; // Cache once at gesture start
+
+      try {
+        viewport.setPointerCapture(e.pointerId);
+      } catch (_) {}
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (!isPointerDown) return;
+
+      currentX = e.clientX;
+      dragDelta = currentX - startX;
+
+      // Require 6px movement before entering drag state (prevents click jitter)
+      if (!isDragging && Math.abs(dragDelta) > 6) {
+        isDragging = true;
+        viewport.classList.add('is-dragging');
+        track.style.transition = 'none';
+      }
+
+      if (isDragging) {
+        if (rAFId) cancelAnimationFrame(rAFId);
+        rAFId = requestAnimationFrame(() => {
+          const baseOffsetPx = -(currentIndex * cachedViewportWidth);
+          const currentOffsetPx = baseOffsetPx + dragDelta;
+          track.style.transform = `translate3d(${currentOffsetPx}px, 0, 0)`;
+        });
+      }
+    });
+
+    function handlePointerEnd(e) {
+      if (!isPointerDown) return;
+      isPointerDown = false;
+
+      if (activePointerId !== null) {
+        try {
+          viewport.releasePointerCapture(activePointerId);
+        } catch (_) {}
+        activePointerId = null;
+      }
+
+      if (rAFId) {
+        cancelAnimationFrame(rAFId);
+        rAFId = null;
+      }
+
+      viewport.classList.remove('is-dragging');
+
+      if (isDragging) {
+        isDragging = false;
+        track.style.transition = 'transform 0.4s var(--ease-snappy)';
+
+        // 15% swipe threshold to trigger slide change
+        const threshold = cachedViewportWidth * 0.15;
+        if (dragDelta < -threshold) {
+          nextSlide();
+        } else if (dragDelta > threshold) {
+          prevSlide();
+        } else {
+          updateCarousel();
+        }
+      }
+    }
+
+    window.addEventListener('pointerup', handlePointerEnd);
+    window.addEventListener('pointercancel', handlePointerEnd);
+
+    // Initialize on load
+    buildCarousel();
+    updateCarousel();
+  </script>
+</body>
+</html>
